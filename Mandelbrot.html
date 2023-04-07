@@ -1,0 +1,75 @@
+# Mandelbrot-Set
+Mandelbrot
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mandelbrot Set Interesting Zoom</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="mandelbrotCanvas" width="800" height="800"></canvas>
+    <script>
+        const canvas = document.getElementById('mandelbrotCanvas');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+
+        function mandelbrot(cX, cY, maxIter) {
+            let zX = 0;
+            let zY = 0;
+            let iter = 0;
+
+            while (iter < maxIter && zX * zX + zY * zY < 4) {
+                const xTemp = zX * zX - zY * zY + cX;
+                zY = 2 * zX * zY + cY;
+                zX = xTemp;
+                iter++;
+            }
+
+            return iter;
+        }
+
+        let zoom = 1;
+        const zoomSpeed = 1.05;
+
+        // Set centerX and centerY to focus on an interesting point in the Mandelbrot set
+        const centerX = -0.743643887037158704752191506114774;
+        const centerY = 0.131825904205311970493132056385139;
+
+        function drawMandelbrot() {
+            const maxIter = 1000;
+            const minX = centerX - 1.5 / zoom;
+            const maxX = centerX + 1.5 / zoom;
+            const minY = centerY - 1.5 / zoom;
+            const maxY = centerY + 1.5 / zoom;
+
+            for (let x = 0; x < width; x++) {
+                for (let y = 0; y < height; y++) {
+                    const cX = minX + (x / width) * (maxX - minX);
+                    const cY = minY + (y / height) * (maxY - minY);
+
+                    const iter = mandelbrot(cX, cY, maxIter);
+
+                    const color = iter === maxIter ? 0 : (iter % 256);
+                    ctx.fillStyle = `rgb(${color}, ${color}, ${color})`;
+                    ctx.fillRect(x, y, 1, 1);
+                }
+            }
+        }
+
+        function update() {
+            drawMandelbrot();
+            zoom *= zoomSpeed;
+            requestAnimationFrame(update);
+        }
+
+        update();
+    </script>
+</body>
+</html>
